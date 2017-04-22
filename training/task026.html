@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>task026</title>
+    <style type="text/css">
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    body{
+        background-color: #101010;
+    }
+    #box{
+        height: 700px;
+        width: 90%;
+        margin: 20px auto;
+        border: 1px solid #6898c2;
+
+    }
+    #console2{
+        float: left;
+        height: 500px;
+        width: 22%;
+        margin: 30px;
+        border: 1px solid #6898c2;
+    }
+    #virtualSpace{
+        float: left;
+        height: 500px;
+        width: 700px;
+        margin: 30px auto;
+        border: 1px solid #6898c2;
+    }
+    #buttons{
+        height: 130px;
+        width: 70%;
+        margin-top: 550px;
+        margin-left: 30px;
+        border: 1px solid #6898c2;
+        color: #aaaaaa;
+    }
+    #buttons div{
+        float: left;
+        margin-left: 20px;
+        margin-top: 7px;
+        width: 70%;
+    }
+    #buttons div button,#buttons div button:hover,#buttons div button:focus{
+        border: 1px solid #056;
+        border-radius:5px;
+        padding: 2px;
+        background: #9ac;
+        outline: none;
+    }
+    #buttons div button:active{
+        border: 1px solid #056;
+        border-radius:5px;
+        padding: 2px;
+        background: #999;
+    }
+    #launchShip,#launchShip:hover,#launchShip:focus{
+        float: left;
+        font-size: 30px;
+        border: 1px solid #056;
+        border-radius:5px;
+        padding: 5px;
+        background: #9ac;
+        outline: none;
+        position: relative;
+        top: -50px;
+    }
+    #launchShip:active{
+        float: left;
+        font-size: 30px;
+        border: 1px solid #056;
+        border-radius:5px;
+        padding: 5px;
+        background: #f00;
+    }
+    /** 控制台整体 */
+    #console {
+        background-color: rgba(150, 150, 150, 0.3);
+        width: 500px;
+        height: 200px;
+        position: fixed;
+        z-index: 100;
+    }
+    /** 控制台标题和操作面板标题 */
+    #console-title, #control-title {
+        color: white;
+        background-color: blue;
+        padding: 5px;
+        width: 490px;
+        height: 20px;
+        cursor: move;
+    }
+
+    /** 控制台文本区 */
+    #console-text {
+        overflow: auto;
+        color: white;
+        padding: 5px;
+        width: 490px;
+        height: 160px;
+    }
+
+    /** 控制台输出内容 */
+    #console-text p {
+        padding: 0;
+        margin: 0 0 0 20px;
+        text-indent: -20px;
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+    }
+
+    /** 控制台输出内容允许复制 */
+    #console-text span {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+    }
+    </style>
+</head>
+
+<body>
+<div id="box">
+    <div id="console2">
+
+    </div>
+    <div id="virtualSpace">
+        <canvas id="canvas">您的浏览器不支持canvas</canvas>
+    </div>
+    <div id="buttons">
+        <div id="ship1">对1号飞船下达指令： <button class="start">开始飞行</button> <button class="stop">停止飞行</button> <button class="destroy">自我销毁</button> </div>
+        <div id="ship2">对2号飞船下达指令： <button class="start">开始飞行</button> <button class="stop">停止飞行</button> <button class="destroy">自我销毁</button> </div>
+        <div id="ship3">对3号飞船下达指令： <button class="start">开始飞行</button> <button class="stop">停止飞行</button> <button class="destroy">自我销毁</button> </div>
+        <div id="ship4">对4号飞船下达指令： <button class="start">开始飞行</button> <button class="stop">停止飞行</button> <button class="destroy">自我销毁</button> </div>
+        <button id="launchShip">发射新飞船</button>
+    </div>
+</div>
+<!-- 控制台 -->
+<div id="console"><div id="console-title">Console 控制台</div><div id="console-text"></div></div>
+</body>
+
+<script type="text/javascript">
+    $ = function (el) { return document.querySelector(el); };
+    $$ = function (el) { return document.querySelectorAll(el); };
+
+    var canvas = $("#canvas");
+    var starts = $$(".start");
+    var stops = $$(".stop");
+    var destroys = $$(".destroy");
+    var launchShip = $("#launchShip");
+    var buttons = $("#buttons");
+
+    var ctx = canvas.getContext("2d");
+    canvas.height = 500;
+    canvas.width = 700;
+    //中心坐标
+    var CENTER_X = canvas.width/2;
+    var CENTER_Y = canvas.height/2;
+
+    var ships = [null,null,null,null];
+    //确定轨道半径
+    var r1 = 100;
+    var r2 = 140;
+    var r3 = 180;
+    var r4 = 220;
+
+
+
+    window.onload = function(){
+        //绘制静态物体
+        renderStatic();
+        /*
+        //显示燃料
+        displayFuel(r1);
+        displayFuel(r2);
+        displayFuel(r3);
+        displayFuel(r4);*/
+
+    };
+
+    //绘制静态物体
+    function renderStatic(){
+        //绘制星球
+        ctx.beginPath();
+        ctx.fillStyle = "black";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.arc(CENTER_X,CENTER_Y,60,0,Math.PI*2);
+        ctx.strokeStyle = "#ccc";
+        ctx.stroke();
+        ctx.fillStyle = "#056";
+        ctx.fill();
+        ctx.closePath();
+
+        //绘制轨道
+        ctx.beginPath();
+        addTrack(r1);
+        addTrack(r2);
+        addTrack(r3);
+        addTrack(r4);
+        ctx.strokeStyle = "#ccc";
+        ctx.stroke();
+        ctx.closePath();
+
+    }
+    //刷新
+    function reset(){
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        renderStatic();
+    }
+
+    //轨道判断
+    function confirmTrack(i){
+        var ri;
+        switch (i){
+            case 0 : ri = r1;
+                break;
+            case 1 : ri = r2;
+                break;
+            case 2 : ri = r3;
+                break;
+            case 3 : ri = r4;
+                break;
+        }
+        return ri;
+    }
+
+    //增加轨道
+    function addTrack(r){
+        ctx.moveTo(CENTER_X + r,CENTER_Y);
+        ctx.arc(CENTER_X,CENTER_Y,r,0,Math.PI*2);
+    }
+
+    //增加第i轨道的飞船
+    function addShips(i){
+        var ri = confirmTrack(i);
+        var aShip = {
+            r : ri ,
+            v : 0.1,
+            angle : 0,
+            fuel : 100,
+            isMoving : false,
+            isActive : false
+        };
+        ships[i] = aShip;
+        renderShips();
+    }
+
+    //渲染飞船
+    function renderShips(){
+        reset();
+        renderStatic();
+        for(var j=0;j<4;j++){
+            if(ships[j]){
+                renderShip(ships[j].angle,ships[j].r);
+                displayFuel(ships[j]);
+            }
+        }
+    }
+
+    function renderShip(angle1,r) {
+        ctx.beginPath();
+        var angle = Math.PI/2 - angle1;
+        ctx.moveTo( (CENTER_X +(r - 12) * Math.cos(angle1) - 20 * Math.cos(angle)), (CENTER_Y -(r - 12) * Math.sin(angle1) - 20 * Math.sin(angle)) );
+        ctx.lineTo( (CENTER_X +(r - 12) * Math.cos(angle1) + 20 * Math.cos(angle)), (CENTER_Y -(r - 12) * Math.sin(angle1) + 20 * Math.sin(angle)) );
+        ctx.lineTo( (CENTER_X +(r + 12) * Math.cos(angle1) + 20 * Math.cos(angle)), (CENTER_Y -(r + 12) * Math.sin(angle1) + 20 * Math.sin(angle)) );
+        ctx.lineTo( (CENTER_X +(r + 12) * Math.cos(angle1) - 20 * Math.cos(angle)), (CENTER_Y -(r + 12) * Math.sin(angle1) - 20 * Math.sin(angle)) );
+        ctx.lineTo( (CENTER_X +(r - 12) * Math.cos(angle1) - 20 * Math.cos(angle)), (CENTER_Y -(r - 12) * Math.sin(angle1) - 20 * Math.sin(angle)) );
+        ctx.strokeStyle = "#aaa";
+        ctx.stroke();
+        ctx.fillStyle = "#c0c0c0";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    //显示飞船燃料
+    function displayFuel(ships){
+        ctx.save();
+        ctx.beginPath();
+        ctx.fillStyle = "red";
+        ctx.font = "bold 15px sans-serif";
+        ctx.translate(CENTER_X, CENTER_Y);
+        ctx.rotate(Math.PI*(1/2) - ships.angle);
+        ctx.fillText(Math.ceil(ships.fuel).toString()+"%",-15,-ships.r+5);
+
+        //ctx.fillText(Math.ceil(ships.fuel).toString()+"%",CENTER_X-10 + ships.r * Math.cos(ships.angle) , CENTER_Y - ships.r * Math.sin(ships.angle),20);
+        ctx.closePath();
+        ctx.restore();
+    }
+
+    launchShip.onclick = function(){
+        for(var i=0;i<4;i++){
+            if(ships[i] == null){
+                addShips(i);
+                console.log(ships[i]);
+                return;
+            }
+        }
+    };
+
+    var temp = [];
+    for(var i=0;i<4;i++){
+        temp[i]=function fn(j){
+            return function(){
+                //让运载目标动起来!
+                starts[j].onclick = function(){
+                    if((ships[j] != null)&&(ships[j].isActive==false)){
+                        ships[j].isMoving = true;
+                        ships[j].isActive = true;
+
+                        var time = setInterval(function(){
+                            if(ships[j] && (ships[j].isActive) && (ships[j].isMoving)){
+                                ships[j].angle += ships[j].v * 0.05 * 2 * Math.PI;
+                                ships[j].fuel -= 0.8;
+                                if(ships[j].fuel < 0){
+                                    ships[j].isMoving = false;
+                                }
+                                reset();
+                                renderShips();
+                            }else if(ships[j] && (ships[j].isMoving==false) && (ships[j].isActive)){
+                                ships[j].fuel += 1.2;
+                                if(ships[j].fuel >= 100){
+                                    ships[j].isMoving = true;
+                                }
+                                reset();
+                                renderShips();
+                            }else{
+                                clearInterval(time);
+                            }
+                        },50);
+                    }
+                };
+
+                //运载目标停下了！
+                stops[j].onclick = function(){
+                    if(ships[j]){
+                        ships[j].isMoving = false;
+                        ships[j].isActive = false;
+                    }
+                };
+
+                //运载目标被干掉了！
+                destroys[j].onclick = function(){
+                    if(ships[j]){
+                        console.log(ships[j]);
+                        ships[j] = null;
+                        renderShips();
+                    }
+                };
+            } ;
+        }(i);
+        temp[i]();
+    }
+
+    /**
+     * 控制台拖动
+     */
+    (function() {
+        //获取对象元素
+        var consoleDiv = document.getElementById("console");
+        var title = document.getElementById("console-title");
+        //初始位置
+        consoleDiv.style.left = (window.innerWidth - consoleDiv.offsetWidth) + "px";            //控制台左上角距离左边的距离
+        consoleDiv.style.top = (window.innerHeight - consoleDiv.offsetHeight) + "px";           //控制台左上角距离上边的距离
+        var draggingControl = false;
+        var start = [0, 0];
+        var position = [
+            consoleDiv.style.left.substr(0, consoleDiv.style.left.length - 2) - 0,
+            consoleDiv.style.top.substr(0, consoleDiv.style.top.length - 2) - 0
+        ];
+        //绑定事件
+        title.addEventListener("mousedown", function(e) {  //鼠标按下事件
+
+            start[0] = e.clientX - position[0];             //点击位置与控制台左上角的距离
+            start[1] = e.clientY - position[1];
+            draggingControl = true;
+        });
+        addEventListener("mouseup", function() {  //鼠标抬起事件
+            draggingControl = false;
+        });
+        addEventListener("mousemove", function(e) {  //鼠标移动事件
+            if(draggingControl) {
+                position[0] = e.clientX - start[0];
+                position[1] = e.clientY - start[1];
+                if(position[0] > window.innerWidth - consoleDiv.offsetWidth) {
+                    position[0] = window.innerWidth - consoleDiv.offsetWidth;
+                }
+                if(position[0] < 0) {
+                    position[0] = 0;
+                }
+                if(position[1] > window.innerHeight - consoleDiv.offsetHeight) {
+                    position[1] = window.innerHeight - consoleDiv.offsetHeight;
+                }
+                if(position[1] < 0) {
+                    position[1] = 0;
+                }
+                consoleDiv.style.left = position[0] + "px";
+                consoleDiv.style.top = position[1] + "px";
+            }
+        });
+    })();
+
+</script>
+</html>

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <style type="text/css">
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #area{
+            position: absolute;
+            top: 20px;
+            left: 70px;
+            width: 600px;
+            height: 600px;
+        }
+        #control{
+            position: absolute;
+            right: 150px;
+            top: 50px;
+            width: 600px;
+            height: 270px;
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+        #label{
+            padding: 20px;
+        }
+        #label button,#label button:hover,#label button:focus{
+            margin-left: 20px;
+            border: 1px solid #056;
+            width: 80px;
+            height: 50px;
+            font-size: 25px;
+            border-radius:5px;
+            padding: 2px;
+            background: #9ac;
+            outline: none;
+        }
+        #label button:active{
+            margin-left: 20px;
+            border: 1px solid #056;
+            border-radius:5px;
+            padding: 2px;
+            background: #999;
+        }
+        #input{
+            margin-left: 22px;
+            width: 560px;
+            height: 200px;
+            color: white;
+            background-color: black;
+            font-size: 20px;
+            line-height: 25px;
+        }
+        #info{
+            position: absolute;
+            right: 150px;
+            top: 400px;
+            width: 600px;
+            height: 260px;
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+        #rowId{
+            position: absolute;
+            top: 39px;
+            border: 1px solid #056;
+            border-radius: 5px;
+            background-color: #ccc;
+            height: 200px;
+            width: 20px;
+            float: left;
+            text-align: center;
+            font-size: 20px;
+            line-height: 25px;
+
+            overflow: hidden;
+        }
+        .normal{
+            height: 25px;
+            line-height: 25px;
+            display: block;
+
+        }
+        .error{
+            background-color: red;
+            height: 25px;
+            line-height: 25px;
+            display: block;
+            border-radius:15px;
+        }
+    </style>
+    <title>task033</title>
+</head>
+<body>
+<div id="area">
+    <canvas id="canvas">
+        您的浏览器不支持canvas
+    </canvas>
+</div>
+
+<div id="control">
+    <div id="rowId">
+        <!--  <span class="normal">1</span>
+          <span class="normal">2</span>
+          <span class="error" >3</span>
+          <span class="normal">4</span>-->
+    </div>
+    <label id="label">请输入指令：<br>
+        <textarea id="input"></textarea><button id="exe">执行</button>
+    </label>
+</div>
+
+<div id="info">
+    <p>
+        操作指令：<br>
+        GO：向蓝色边所面向的方向前进一格（一格等同于正方形的边长）<br>
+        TUN LEF：向左转（逆时针旋转90度）<br>
+        TUN RIG：向右转（顺时针旋转90度）<br>
+        TUN BAC：向右转（旋转180度）<br>
+        TRA LEF：向屏幕的左侧移动一格，方向不变<br>
+        TRA TOP：向屏幕的上面移动一格，方向不变<br>
+        TRA RIG：向屏幕的右侧移动一格，方向不变<br>
+        TRA BOT：向屏幕的下面移动一格，方向不变<br>
+        MOV LEF：方向转向屏幕左侧，并向屏幕的左侧移动一格<br>
+        MOV TOP：方向转向屏幕上面，向屏幕的上面移动一格<br>
+        MOV RIG：方向转向屏幕右侧，向屏幕的右侧移动一格<br>
+        MOV BOT：方向转向屏幕下面，向屏幕的下面移动一格<br>
+        对于GO，TRA以及MOV指令增加可以移动格子数量的参数，例如 MOV RIG 4<br>
+</div>
+</body>
+<script type="text/javascript">
+    $ = function (el) { return document.querySelector(el); };
+    $$ = function (el) { return document.querySelectorAll(el); };
+
+    var canvas = $("#canvas");
+    var area = $("#area");
+    var control = $("#control");
+    var input = $("#input");
+    var exe = $("#exe");
+    var rowId = $("#rowId");
+    var spans = rowId.getElementsByTagName("span");
+    //格子
+    var box = [[]];
+    for(var k=0;k<11;k++){
+        box[k] = [];
+    }
+    //每个小方块box[i][j]左上角的坐标
+    for(var i=1;i<11;i++){
+        for(var j=1;j<11;j++){
+            box[i][j] = {
+                x : 50*i,
+                y : 50*j,
+                direction : 0
+            };
+        }
+    }
+    //方块
+    var block = [parseInt(6),parseInt(6),parseInt(0)];
+    var originalBlock = block.concat();  //初始化旧方块
+    var newBlock = [];                  //初始化新方块
+
+    var context = canvas.getContext("2d");
+    canvas.height = 600;
+    canvas.width = 600;
+
+    reset();
+    renderBox(block,null);
+    exe.onclick = function(){
+        var inputStr = input.value;
+        var i = 0;
+        //分割命令
+        var Command = inputStr.split("\n");
+        console.log(spans);
+        //检查输入合法性
+        for(var j=0;j<Command.length;j++){
+            var tempBlock = analyze(Command[j],originalBlock);     //每次点击得到新方块的位置
+            if(tempBlock == null){
+                spans[j].className = "error";
+                return;
+            }
+        }
+
+        var timer = setInterval(function(){
+            if(i<Command.length){
+                newBlock = analyze(Command[i],originalBlock);     //每次点击得到新方块的位置
+                if(newBlock == null){
+                    spans[i+1].className = "error";
+                    return;
+                }
+                reset();
+                console.log(originalBlock);
+                console.log(newBlock);
+                renderBox(originalBlock,newBlock);
+                originalBlock = newBlock.concat();                  //最后将渲染后的方块保存到旧盒子里
+                i++;
+            }else{
+                clearInterval(timer);
+            }
+        },500);                                                     //此处新增一个delay方法进行链式操作会使动画更流畅
+    };
+
+    //输入框上下滚动时，代码行数列同步滚动
+    input.addEventListener("keyup",function(){
+        rowChanging();
+    });
+    input.addEventListener("scroll",function(){
+        rowId.scrollTop = input.scrollTop;
+    });
+    function rowChanging(){
+        var inputStr = input.value;
+        var Command = inputStr.split("\n");
+        var arr = [];
+        for(var i=0;i<Command.length;i++){
+            arr.push('<span class="normal">'+(i+1)+'</span>')
+        }
+        rowId.innerHTML = arr.join("");
+        rowId.scrollTop = input.scrollTop;
+    }
+
+
+
+    function addRect(){
+        context.beginPath();
+        context.lineWidth = 2;
+        context.strokeStyle = "black";
+        context.rect(50,50,500,500);
+        context.stroke();
+        context.closePath();
+    }
+
+    function addNum(){
+        context.beginPath();
+        context.font = "bold 20px sans-serif";
+        context.fillStyle = "black";
+        for(var i=1;i<11;i++){
+            context.fillText(i.toString(),15+50*i,35);
+        }
+        for(var j=1;j<11;j++){
+            context.fillText(j.toString(),20,30+50*j);
+        }
+        context.stroke();
+        context.closePath();
+    }
+
+    function addLine(){
+        context.beginPath();
+        context.strokeStyle = "#ccc";
+        for(var i=1;i<10;i++){
+            context.moveTo(50,(i+1)*50);
+            context.lineTo(550,(i+1)*50);
+        }
+        for(var j=1;j<10;j++){
+            context.moveTo((j+1)*50,50);
+            context.lineTo((j+1)*50,550);
+        }
+        context.stroke();
+        context.closePath();
+    }
+
+    function reset(){
+        context.beginPath();
+        context.clearRect(0,0,canvas.width, canvas.height);
+        context.closePath();
+        addRect();
+        addNum();
+        addLine();
+    }
+
+    function renderBox(oldBlock,newBlock){
+        var v = 10;                         //运动速度
+        var r = Math.PI*(1/20);              //转动速度
+
+        var oldRow = oldBlock[0];
+        var oldCol = oldBlock[1];
+        var oldDirect = oldBlock[2];
+        oldDirect = angleLimiter(oldDirect);
+        var oldBlock_x = box[oldRow][oldCol].x;
+        var oldBlock_y = box[oldRow][oldCol].y;
+
+        if(newBlock){
+            var newRow = newBlock[0];
+            var newCol = newBlock[1];
+            var newDirect = newBlock[2];
+            newDirect = angleLimiter(newDirect);
+            var newBlock_x = box[newRow][newCol].x;
+            var newBlock_y = box[newRow][newCol].y;
+
+            var Tangle = getAngle();
+            turnRect(Tangle);           //此时oldBlock的方向已改变，但变量值未变
+            //oldBlock[2] = newBlock[2];
+            var distance = getDistance();
+            moveRect(distance);
+            console.log(distance);
+
+        }else{
+            console.log(newBlock);
+            renderBlock(oldBlock);
+        }
+
+        function angleLimiter(direct){
+            while(direct<0){
+                direct += 4;
+            }
+            if(direct>3){
+                direct = direct % 4;
+            }
+            return parseInt(direct);
+        }
+        function renderBlock(block){
+
+            var row = block[0];
+            var col = block[1];
+            var direct = block[2];
+            var block_x = box[row][col].x;
+            var block_y = box[row][col].y;
+
+            context.fillStyle = "red";
+            context.fillRect(block_x,block_y,50,50);
+            context.stroke();
+
+            direct = angleLimiter(direct);
+
+            switch (direct){
+                case 0 :
+                    context.fillStyle = "blue";
+                    context.fillRect(block_x,block_y,50,15);
+                    context.stroke();
+                    break;
+                case 1 :
+                    context.fillStyle = "blue";
+                    context.fillRect(35+block_x,block_y,15,50);
+                    context.stroke();
+                    break;
+                case 2 :
+                    context.fillStyle = "blue";
+                    context.fillRect(block_x,35+block_y,50,15);
+                    context.stroke();
+                    break;
+                case 3 :
+                    context.fillStyle = "blue";
+                    context.fillRect(block_x,block_y,15,50);
+                    context.stroke();
+            }
+        }
+        function getAngle(){
+            var chgDirect = newDirect - oldDirect;
+            console.log(chgDirect);
+            chgDirect = angleLimiter(chgDirect);
+            var angle;
+            switch (chgDirect){
+                case 0:
+                    angle = 0;
+                    break;
+                case 1:
+                    angle = Math.PI*(1/2);
+                    console.log(angle);
+                    break;
+                case 2:
+                    angle = Math.PI;
+                    break;
+                case 3:
+                    console.log(chgDirect);
+                    angle = -Math.PI*(1/2);
+                    break;
+            }
+            return angle;
+        }
+
+        function turnRect(angle){
+            var targetAngle = 0;
+            function f1(){
+                if(angle>0){
+                    if(targetAngle <= angle){
+                        reset();
+                        context.save();
+                        context.beginPath();
+                        context.translate(oldBlock_x + 25,oldBlock_y + 25);
+                        context.rotate(targetAngle);
+                        context.translate(-oldBlock_x - 25,-oldBlock_y - 25);
+                        renderBlock(oldBlock);
+                        console.log(targetAngle);
+                        targetAngle += r;
+                        context.closePath();
+                        context.restore();
+                    }else{
+                        clearInterval(timer);
+                        targetAngle = 0;
+                        Tangle = 0;
+                    }
+                }else if(angle<0){
+                    if(targetAngle >= angle){
+                        reset();
+                        context.save();
+                        context.beginPath();
+                        context.translate(oldBlock_x + 25,oldBlock_y + 25);
+                        context.rotate(targetAngle);
+                        context.translate(-oldBlock_x - 25,-oldBlock_y - 25);
+                        renderBlock(oldBlock);
+                        targetAngle -= r;
+                        context.closePath();
+                        context.restore();
+                    }else{
+                        clearInterval(timer);
+                        targetAngle = 0;
+                        Tangle = 0;
+                    }
+                }else{
+                    clearInterval(timer);
+                    targetAngle = 0;
+                    Tangle = 0;
+                }
+
+            }
+            f1();
+            var timer = setInterval(function(){f1()},50);
+        }
+
+        function getDistance(){
+            return [newBlock_x - oldBlock_x,newBlock_y - oldBlock_y];
+        }
+        function moveRect(distance){
+            var target_x = 0;
+            var target_y = 0;
+
+            function f2(){
+                if((distance[0]>0)&&(target_x <= distance[0])){
+                    reset();
+                    context.save();
+                    context.beginPath();
+                    context.translate(target_x,0);
+                    renderBlock(oldBlock);
+                    target_x += v;
+                    context.closePath();
+                    context.restore();
+                }else if((distance[0]<0)&&(target_x >= distance[0])){
+                    reset();
+                    context.save();
+                    context.beginPath();
+                    context.translate(target_x,0);
+                    renderBlock(oldBlock);
+                    target_x -= v;
+                    context.closePath();
+                    context.restore();
+                }else if((distance[1]>0)&&(target_y <= distance[1])){
+                    reset();
+                    context.save();
+                    context.beginPath();
+                    context.translate(0,target_y);
+                    renderBlock(oldBlock);
+                    target_y += v;
+                    context.closePath();
+                    context.restore();
+                }else if((distance[1]<0)&&(target_y >= distance[1])){
+                    reset();
+                    context.save();
+                    context.beginPath();
+                    context.translate(0,target_y);
+                    renderBlock(oldBlock);
+                    target_y -= v;
+                    context.closePath();
+                    context.restore();
+                }
+                else{
+                    clearInterval(timer);
+                    target_x = 0;
+                }
+            }
+            var timer = setInterval(function(){
+                if(Tangle == 0){           //等待旋转操作完成后
+                    oldBlock[2] = newBlock[2];
+                    f2();
+                    console.log(Tangle);
+                }
+            },50);
+        }
+    }
+
+    function analyze(Str,originalBlock){
+        var str = Str.toString().trim();
+        console.log(str);
+        //原来的状态
+        var newBlock = originalBlock.concat();
+        //获得前进的步数
+        var step = getStep(str);
+        //移动方向
+        var dir = newBlock[2];
+
+        var RXP_go= /^GO/;      //不旋转 走
+        var RXP_tun= /^TUN/;   //旋转 不走
+
+        //判断方向
+        var RXP_tra = /^TRA/;   // 走 方向不旋转
+        var RXP_mov = /^MOV/;  //旋转 走
+        //判断前进方向
+        var RXP_top = /TOP/;    //上
+        var RXP_rig = /RIG/;    //右
+        var RXP_bot = /BOT/;    //下
+        var RXP_lef = /LEF/;    //左
+
+        var RXP_bac = /BAC/;
+
+        //获得前进的步数
+        function getStep(str){
+            var step = str.charAt(str.length - 1);
+            var isNum = /\d/;
+            if(isNum.test(step) == false){
+                step = 1;
+            }
+            return parseInt(step);
+        }
+        //边界判断
+        function borderLimiter(){
+            if(newBlock[0]<1){
+                newBlock[0] = 1;
+            }
+            if(newBlock[0]>10){
+                newBlock[0] = 10;
+            }
+            if(newBlock[1]<1){
+                newBlock[1] = 1;
+            }
+            if(newBlock[1]>10){
+                newBlock[1] = 10;
+            }
+        }
+        //判断方向
+        function getDirection(){
+            //上
+            if(RXP_top.test(str)){
+                dir = 0;
+            }
+            //右
+            if(RXP_rig.test(str)){
+                dir = 1;
+            }
+            //下
+            if(RXP_bot.test(str)){
+                dir = 2;
+            }
+            //左
+            if(RXP_lef.test(str)){
+                dir = 3;
+            }
+            if(RXP_bac.test(str)){
+                dir = newBlock[2]+2;
+            }
+        }
+
+        function moving(){
+            while(dir<0){
+                dir += 4;
+            }
+            if(dir>3){
+                dir = dir % 4;
+            }
+            switch (dir){
+                case 0:
+                    newBlock[1] -= step;
+                    console.log(newBlock[1]);
+                    borderLimiter();
+                    break;
+                case 1:
+                    console.log(newBlock[0]);
+                    newBlock[0] += step;
+                    console.log(newBlock[0]);
+                    borderLimiter();
+                    break;
+                case 2:
+                    newBlock[1] += step;
+                    borderLimiter();
+                    break;
+                case 3:
+                    console.log(newBlock[0]);
+                    newBlock[0] -= step;
+                    console.log(newBlock[0]);
+                    borderLimiter();
+                    break;
+            }
+        }
+
+        //不旋转 走
+        if(RXP_go.test(str)){
+            console.log(dir);
+            moving();
+        }
+        //旋转 不走
+        else if(RXP_tun.test(str)){
+            if(RXP_lef.test(str)){
+                dir = newBlock[2]-1;
+            }
+            if(RXP_rig.test(str)){
+                dir = newBlock[2]+1;
+            }
+            if(RXP_bac.test(str)){
+                dir = newBlock[2]+2;
+            }
+            while(dir<0){
+                dir += 4;
+            }
+            if(dir>3){
+                dir = dir % 4;
+            }
+            console.log(dir);
+
+            newBlock[2] = dir;
+        }
+        // 走 方向不旋转
+        else if(RXP_tra.test(str)){
+            getDirection();
+            console.log(dir);
+            moving();
+        }
+        //旋转 走
+        else if(RXP_mov.test(str)){
+            getDirection();
+            newBlock[2] = dir;
+            moving();
+        }else{
+            newBlock = null;
+        }
+        return newBlock;
+    }
+
+</script>
+</html>

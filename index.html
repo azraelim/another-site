@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title></title>
+    <style type="text/css">
+        .list div{
+            width: 20%;
+            height: 30px;
+            margin-top: 10px;
+            background-color: #07317a;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .list a{
+            font-size: 20px;
+            line-height: 30px;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="list">
+        <div id="yhd"><a href="./no1/index.html">1号店</a></div>
+        <div id="m_yhd"><a href="./m_yhd/m_yhd.html">手机1号店</a></div>
+    </div>
+    <p id="infomation">当前浏览器的宽度为<span id="width"></span>，高度为<span id="height"></span></p>
+</body>
+<script type="text/javascript">
+    function getwidth(){
+        var winWidth,winHeight;
+        if (window.innerWidth){
+            winWidth = window.innerWidth;
+        }
+        else if ((document.body) && (document.body.clientWidth))
+            winWidth = document.body.clientWidth;
+        // 获取窗口高度
+        if (window.innerHeight)
+            winHeight = window.innerHeight;
+        else if ((document.body) && (document.body.clientHeight))
+            winHeight = document.body.clientHeight;
+        // 通过深入 Document 内部对 body 进行检测，获取窗口大小
+        var width = document.getElementById("width");
+        var height = document.getElementById("height");
+        width.innerHTML = winWidth;
+        height.innerHTML = winHeight;
+    }
+    getwidth();
+</script>
+</html>

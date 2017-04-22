@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> task038 </title>
+    <style type="text/css">
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #table{
+            position: absolute;
+            left: 50px;
+            top: 300px;
+            width: 50%;
+        }
+        #table tr{
+
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+            background-color: #ffffff;
+        }
+        #table tr td{
+            height: 50px;
+            width: 100px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        #table #firstLine{
+            border: none;
+            height: 50px;
+            width: 50%;
+
+            background-color: black;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        #table #firstLine th{
+            height: 50px;
+            width: 200px;
+
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .up{
+            border-left:5px solid transparent;
+            border-right:5px solid transparent;
+            border-bottom: 10px solid #f72;
+            cursor: pointer;
+
+            position: relative;
+            top: -22px;
+            left: 10px;
+        }
+        .down{
+            border-left:5px solid transparent;
+            border-right:5px solid transparent;
+            border-top: 10px solid #f72;
+            cursor: pointer;
+
+            position: relative;
+            top: 22px;
+            left: 1px;
+        }
+
+        #addMember,#addMember:hover,#addMember:focus{
+            position: fixed;
+            top: 100px;
+            right: 100px;
+
+            border: 1px solid #056;
+            width: 200px;
+            height: 40px;
+            font-size: 25px;
+            border-radius:5px;
+            padding: 2px;
+            background: #9ac;
+            outline: none;
+            cursor: pointer;
+        }
+        #addMember:active{
+            border: 1px solid #056;
+            border-radius:5px;
+            padding: 2px;
+            background: #999;
+            cursor: pointer;
+        }
+        #add20{
+            position: fixed;
+            top: 150px;
+            right: 100px;
+            border: 1px solid #056;
+            width: 200px;
+            height: 40px;
+            font-size: 25px;
+            border-radius:5px;
+            padding: 2px;
+            background: #9ac;
+            outline: none;
+            cursor: pointer;
+        }
+        #test{
+            margin-top: 300px;
+            width: 60%;
+        }
+
+    </style>
+</head>
+<body>
+
+<table  border="1" id="table">
+    <thead>
+        <tr id="firstLine">
+            <th>姓名</th>
+            <th>语文 <span class="up"></span><span class="down"></span> </th>
+            <th>数学 <span class="up"></span><span class="down"></span> </th>
+            <th>英语 <span class="up"></span><span class="down"></span> </th>
+            <th>总分 <span class="up"></span><span class="down"></span> </th>
+            <th>操作</th>
+        </tr>
+    </thead>
+
+    <tr id="SecondLine">
+        <td>王小明</td>
+        <td class="score1">50</td>
+        <td class="score2">50</td>
+        <td class="score3">50</td>
+        <td class="total">150</td>
+        <td><a  href="#" onclick="del(this)">删除</a></td>
+    </tr>
+    <tr>
+        <td>刘小芳</td>
+        <td class="score1">11</td>
+        <td class="score2">12</td>
+        <td class="score3">13</td>
+        <td class="total">36</td>
+        <td><a  href="#" onclick="del(this)">删除</a></td>
+    </tr>
+</table>
+<div id="test">
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+    <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
+</div>
+<button id="addMember" onclick="add()">添加一行</button>
+<button id="add20">添加20行</button>
+</body>
+<script type="text/javascript">
+    window.onload = function(){
+        // 鼠标移动改变背景,可以通过给每行绑定鼠标移上事件和鼠标移除事件来改变所在行背景色。
+        var row = document.getElementsByTagName("tr");
+        for(var r=1;r<row.length;r++) {
+            bgchange(row[r]);
+        }
+    };
+
+    function bgchange(row){
+        row.onmouseover = function (){
+            row.style.backgroundColor = "#f2f2f2";
+        };
+        row.onmouseout = function(){
+            row.style.backgroundColor = "#fff";
+        };
+    }
+
+    var add20 = document.getElementById("add20");
+    add20.onclick = function(){
+        for(var i=0;i<20;i++){
+            add();
+        }
+    };
+    // 编写一个函数，供添加按钮调用，动态在表格的最后一行添加子节点；
+    var i=2;
+    var table = document.getElementById("table");
+    function add(){
+
+        var newMember = document.createElement("tr");
+        var cols = [];
+        for(var c=0;c<6;c++){
+            cols[c] = document.createElement("td");
+        }
+
+        var temp = [];
+        for(var k=0;k<3;k++){
+            temp[k] = Math.floor(Math.random() * 100);
+        }
+        cols[0].innerHTML = "NO "+(i++);
+        cols[1].innerHTML =temp[0].toString();
+        cols[1].className = "score1";
+        cols[2].innerHTML =temp[1].toString();
+        cols[2].className = "score2";
+        cols[3].innerHTML =temp[2].toString();
+        cols[3].className = "score3";
+        cols[4].innerHTML =(temp[0]+temp[1]+temp[2]).toString();
+        cols[4].className = "total";
+        cols[5].innerHTML = '<a href="#" onclick="del(this)">删除</a>';
+        for(var a=0;a<6;a++){
+            newMember.appendChild(cols[a]);
+        }
+        table.appendChild(newMember);
+
+        var tr = document.getElementsByTagName("tr");
+        for(var j=1;j<tr.length;j++)
+        {
+            bgchange(tr[j]);
+        }
+    }
+    // 创建删除函数
+    function del(obj){
+        var oG=obj.parentNode.parentNode.parentNode;
+        var oP=obj.parentNode.parentNode;
+        oG.removeChild(oP);
+    }
+
+    // 初始状态
+    function reset(){
+        table.innerHTML ="<thead><tr id='firstLine'> <th>姓名</th> " +
+                "<th>语文 <span class='up'></span><span class='down'></span> </th>" +
+                " <th>数学 <span class='up'></span><span class='down'></span> </th> " +
+                "<th>英语 <span class='up'></span><span class='down'></span> </th>" +
+                " <th>总分 <span class='up'></span><span class='down'></span>" +
+                " </th> <th>操作</th> </tr></thead>";
+    }
+    //重新添加
+    function reAdd(score){
+        for(var i=0;i<score.length;i++){
+            if(score[i][1] != undefined){
+                table.appendChild(score[i][1]);
+            }
+        }
+        add_events();
+    }
+
+    //获取列表值
+    var score_1 = document.getElementsByClassName("score1");
+    var score_2 = document.getElementsByClassName("score2");
+    var score_3 = document.getElementsByClassName("score3");
+    var total_s = document.getElementsByClassName("total");
+    var score1 = [],score2 = [],score3 = [],total = [];
+    score1 = Arrayyyy(score1);
+    score2 = Arrayyyy(score2);
+    score3 = Arrayyyy(score3);
+    total = Arrayyyy(total);
+    //初始化数组
+    function Arrayyyy(score){
+        for(var k=0;k<99;k++){
+            score[k] = [];
+        }
+        return score;
+    }
+
+    function getData(){
+        score_1 = document.getElementsByClassName("score1");
+        score_2 = document.getElementsByClassName("score2");
+        score_3 = document.getElementsByClassName("score3");
+        total_s = document.getElementsByClassName("total");
+
+        for(var s=0;s<score_1.length;s++){                   //s表示第s行
+            score1[s][0] = parseInt(score_1[s].innerText);
+            score2[s][0] = parseInt(score_2[s].innerText);
+            score3[s][0] = parseInt(score_3[s].innerText);
+            total[s][0] = parseInt(total_s[s].innerText);
+
+            score1[s][1] = score_1[s].parentElement ;         //此处存储各tr行
+            score2[s][1] = score_2[s].parentElement ;
+            score3[s][1] = score_3[s].parentElement ;
+            total[s][1] = total_s[s].parentElement ;
+        }
+    }
+
+    //获取按钮并添加事件
+    var ups = document.getElementsByClassName("up");
+    var downs = document.getElementsByClassName("down");
+    var temp = [];
+    for(var t=0;t<4;t++){
+        temp[t]=function fn(x) {
+            return function () {
+                ups[x].addEventListener("click",function(){
+                    getData();
+                    switch (x){
+                        case 0:
+                            upSort(score1);
+                            reset();
+                            reAdd(score1);
+                            break;
+                        case 1:
+                            upSort(score2);
+                            reset();
+                            reAdd(score2);
+                            break;
+                        case 2:
+                            upSort(score3);
+                            reset();
+                            reAdd(score3);
+                            break;
+                        case 3:
+                            upSort(total);
+                            reset();
+                            reAdd(total);
+                            break;
+                    }
+                });
+
+                downs[x].addEventListener("click",function(){
+                    getData();
+                    switch (x){
+                        case 0:
+                            downSort(score1);
+                            reset();
+                            reAdd(score1);
+                            break;
+                        case 1:
+                            downSort(score2);
+                            reset();
+                            reAdd(score2);
+                            break;
+                        case 2:
+                            downSort(score3);
+                            reset();
+                            reAdd(score3);
+                            break;
+                        case 3:
+                            downSort(total);
+                            reset();
+                            reAdd(total);
+                            break;
+                    }
+                })
+            };
+        }(t);
+        temp[t]();
+    }
+
+    //首行冻结功能
+    var firstLine = document.getElementById("firstLine");
+    addEventListener("scroll",function(){
+        console.log(document.body.scrollTop);
+        console.log(table.offsetTop + table.offsetHeight);
+        if(document.body.scrollTop > table.offsetTop){
+            firstLine.style.position = "fixed";
+            firstLine.style.top = 0;
+            if(document.body.scrollTop > (table.offsetTop + table.offsetHeight)){
+                firstLine.style.position = "";
+                firstLine.style.top = table.offsetTop + table.offsetHeight - firstLine.offsetHeight;
+            }
+        }else if(document.body.scrollTop < table.offsetTop){
+            firstLine.style.position = "";
+            firstLine.style.top = 300;
+            if(document.body.scrollTop < (table.offsetTop + table.offsetHeight)){
+                firstLine.style.top = 0;
+            }
+        }
+    });
+
+    function add_events(){
+        for(var t=0;t<4;t++){
+            temp[t]();
+        }
+    }
+
+    //从大到小排序
+    function downSort(score){
+        var i,j;
+        var temp;
+        for(i=0;i<score.length;i++) {
+            for (j = 0; j < score.length-i-1; j++) {
+                if (score[j][0] > score[j + 1][0]) {
+                    temp = score[j];
+                    score[j] = score[j + 1];
+                    score[j + 1] = temp;
+                }
+            }
+        }
+        return score;
+    }
+    //从小到大排序
+    function upSort(score){
+        var i,j;
+        var temp;
+        for(i=0;i<score.length;i++) {
+            for (j = 0; j < score.length-i-1; j++) {
+                if (score[j][0] < score[j + 1][0]) {
+                    temp = score[j];
+                    score[j] = score[j + 1];
+                    score[j + 1] = temp;
+                }
+            }
+        }
+        return score;
+    }
+</script>
+</html>
